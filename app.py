@@ -2,10 +2,10 @@ import streamlit as st
 import pandas as pd
 
 # Fungsi untuk menghitung VR
-def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break):
+def calculate_vr(discharge, load, CI, GCR, MB):
     try:
-        vr = (discharge + load) / (((discharge + load) / crane_intensity / crane_performance) + meal_break)
-        return round(vr, 2)  # Membulatkan hasil VR menjadi 2 angka di belakang koma
+        vr = (discharge + load) / (((discharge + load) / CI / GCR) + MB)
+        return round(vr,2)
     except ZeroDivisionError:
         return 0
 
@@ -15,9 +15,12 @@ if uploaded_file is not None:
     # Membaca file Excel yang di-upload
     df = pd.read_excel(uploaded_file, engine="openpyxl")
     
+    # Menampilkan nama kolom untuk memeriksa kolom yang ada (opsional, bisa dihapus)
+    # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
+    
     # Mengecek apakah kolom yang diperlukan ada
-    required_columns = ['Vessel', 'Month', 'Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 
-                        'Performance Crane', 'Meal Break Time']
+    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'CI', 
+                        'GCR', 'MB']
     
     # Mengecek apakah semua kolom yang dibutuhkan ada dalam data
     missing_columns = [col for col in required_columns if col not in df.columns]
@@ -26,8 +29,8 @@ if uploaded_file is not None:
     else:
         # Menghitung VR untuk setiap kapal
         df['VR'] = df.apply(lambda row: calculate_vr(
-            row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'],
-            row['Performance Crane'], row['Meal Break Time']), axis=1)
+            row['Disch'], row['Load'], row['CI'],
+            row['GCR'], row['MB']), axis=1)
         
         # Mengatur kolom 'Vessel' sebagai index dataframe
         df = df.set_index('Vessel')
@@ -43,11 +46,11 @@ if uploaded_file is not None:
             month = st.selectbox("Pilih bulan", df['Month'].unique())
             df_filtered = df[df['Month'] == month]
             avg_vr = df_filtered['VR'].mean()
-            st.write(f"Rata-rata VR untuk bulan {month}: {round(avg_vr, 2)}") # Pembulatan di sini
+            st.write(f"Rata-rata VR untuk bulan {month}: {rond(avg_vr, 2)}")
         else:
             # Rata-rata VR keseluruhan
             avg_vr = df['VR'].mean()
-            st.write(f"Rata-rata VR keseluruhan: {round(avg_vr, 2)}") # Pembulatan di sini
+            st.write(f"Rata-rata VR keseluruhan: {round(avg_vr, 2}")
         
         # Menampilkan input untuk target VR dan estimasi jumlah kapal berikutnya
         target_vr = st.number_input("Masukkan target VR yang ingin dicapai", min_value=0, value=80)
@@ -67,4 +70,4 @@ if uploaded_file is not None:
         average_vr_for_new_ships = vr_needed_by_new_ships / estimated_ships
         
         # Menampilkan hasil Rate to Go
-        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {round(average_vr_for_new_ships, 2)}") # Pembulatan di sini
+        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {average_vr_for_new_ships}")
