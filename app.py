@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Fungsi untuk menghitung VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
@@ -36,6 +37,17 @@ if uploaded_file is not None:
         
         # Menampilkan data kapal dengan VR yang dihitung
         st.write("Data Kapal dengan VR yang dihitung:", df)
+
+# Konfigurasi GridOptionsBuilder
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_default_column(editable=True, groupable=True, value=True, enableRowGroup=True, aggFunc='sum')
+    gb.configure_selection('single')
+    gb.configure_grid_options(domLayout='normal')
+    gridOptions = gb.build()
+
+    # Menampilkan tabel AgGrid
+    AgGrid(df, gridOptions=gridOptions)
+
         
         # Memilih opsi apakah perhitungan VR berdasarkan bulan atau keseluruhan
         time_period = st.selectbox("Pilih periode perhitungan VR", ["Overall", "Per Month"])
