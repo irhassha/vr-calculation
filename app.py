@@ -4,7 +4,7 @@ import pandas as pd
 # Fungsi untuk menghitung VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     try:
-        vr = (discharge + load + TS_SHF) / (((discharge + load + TS-SHF) / CI / GCR) + MB)
+        vr = (discharge + load + TS_SHF) / (((discharge + load + TS_SHF) / CI / GCR) + MB)
         return round(vr,2)
     except ZeroDivisionError:
         return 0
@@ -19,7 +19,7 @@ if uploaded_file is not None:
     # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
     
     # Mengecek apakah kolom yang diperlukan ada
-    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'TS_SHF', 'CI', 'GCR', 'MB']
+    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'TS SHF', 'CI', 'GCR', 'MB']
     
     # Mengecek apakah semua kolom yang dibutuhkan ada dalam data
     missing_columns = [col for col in required_columns if col not in df.columns]
@@ -28,7 +28,7 @@ if uploaded_file is not None:
     else:
         # Menghitung VR untuk setiap kapal
         df['VR'] = df.apply(lambda row: calculate_vr(
-            row['Disch'], row['Load'], row['TS_SHF'], row['CI'],
+            row['Disch'], row['Load'], row['TS SHF'], row['CI'],
             row['GCR'], row['MB']), axis=1)
         
         # Mengatur kolom 'Vessel' sebagai index dataframe
