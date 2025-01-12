@@ -9,13 +9,15 @@ def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break
     vr = (discharge + load) / (((discharge + load) / crane_intensity / crane_performance) + meal_break)
     return vr
 
-# Fungsi untuk menghitung rate to go
-def calculate_rate_to_go(df, target_vr):
+# Fungsi untuk menghitung rate to go berdasarkan estimasi kapal berikutnya
+def calculate_rate_to_go(df, target_vr, estimated_ships):
     # Menghitung rata-rata VR yang sudah ada
     avg_vr = df['VR'].mean()
+    
     if avg_vr == 0:
         return target_vr  # Jika avg_vr adalah 0, kapal berikutnya butuh target VR penuh
-    return target_vr - avg_vr
+    rate_to_go = (target_vr - avg_vr) * estimated_ships
+    return rate_to_go
 
 # Upload file Excel untuk data kapal
 st.title('Kalkulator VR Kapal')
@@ -90,18 +92,24 @@ if df is not None:
     # Kolom untuk menginput target VR
     target_vr = st.number_input("Masukkan Target VR", min_value=0.0, step=0.01)
 
+    # Kolom untuk menginput estimasi jumlah kapal berikutnya
+    estimated_ships = st.number_input("Masukkan Estimasi Jumlah Kapal Berikutnya", min_value=1, step=1)
+
     # Menampilkan hasil perhitungan target VR
     st.write(f"Target VR yang dimasukkan: {target_vr}")
 
-    # Menghitung rate to go untuk kapal berikutnya
-    df['Rate to Go'] = df.apply(lambda row: calculate_rate_to_go(df, target_vr), axis=1)
+    # Menghitung rate to go
+    rate_to_go = calculate_rate_to_go(df, target_vr, estimated_ships)
+
+    # Menampilkan hasil rate to go
+    st.write(f"Rate to Go (Total VR yang dibutuhkan untuk kapal berikutnya): {rate_to_go:.2f} VR")
 
     # Menambahkan kolom untuk target VR
     df['Target VR'] = target_vr
 
     # Menampilkan data kapal dengan VR dan rate to go
-    st.write("Data Kapal dengan VR dan Rate to Go:")
-    st.write(df[['Vessel', 'Month', 'VR', 'Target VR', 'Rate to Go']])
+    st.write("Data Kapal dengan VR dan Target VR:")
+    st.write(df[['Vessel', 'Month', 'VR', 'Target VR']])
 
     # Menyimpan kembali ke file Excel menggunakan BytesIO untuk membuat file Excel
     def to_excel(df):
