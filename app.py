@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 
 # Fungsi untuk menghitung VR
-def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break):
+def calculate_vr(discharge, load, CI, GCR, MB):
     try:
-        vr = (discharge + load) / (((discharge + load) / crane_intensity / crane_performance) + meal_break)
+        vr = (discharge + load) / (((discharge + load) / CI / GCR) + MB)
         return vr
     except ZeroDivisionError:
         return 0
@@ -19,8 +19,8 @@ if uploaded_file is not None:
     # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
     
     # Mengecek apakah kolom yang diperlukan ada
-    required_columns = ['Vessel', 'Month', 'Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 
-                        'Performance Crane', 'Meal Break Time']
+    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'CI', 
+                        'GCR', 'MB']
     
     # Mengecek apakah semua kolom yang dibutuhkan ada dalam data
     missing_columns = [col for col in required_columns if col not in df.columns]
@@ -29,8 +29,8 @@ if uploaded_file is not None:
     else:
         # Menghitung VR untuk setiap kapal
         df['VR'] = df.apply(lambda row: calculate_vr(
-            row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'],
-            row['Performance Crane'], row['Meal Break Time']), axis=1)
+            row['Disch'], row['Load'], row['CI'],
+            row['GCR'], row['MB']), axis=1)
         
         # Mengatur kolom 'Vessel' sebagai index dataframe
         df = df.set_index('Vessel')
