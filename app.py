@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from io import BytesIO
 
 # Fungsi untuk menghitung VR dengan pengecekan pembagian nol
 def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break):
@@ -61,6 +62,13 @@ st.write(df[['Vessel', 'VR']])
 average_vr = df['VR'].mean()
 st.write(f"Rata-rata VR dari semua kapal: {average_vr:.2f}")
 
-# Menyimpan kembali ke file Excel
-excel_data = df.to_excel(index=False, engine='openpyxl')
+# Menyimpan kembali ke file Excel menggunakan BytesIO untuk membuat file Excel
+def to_excel(df):
+    output = BytesIO()
+    with pd.ExcelWriter(output, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False)
+    return output.getvalue()
+
+# Menyimpan kembali ke file Excel dan menyediakan tombol unduh
+excel_data = to_excel(df)
 st.download_button("Unduh Data Kapal yang Diperbarui", data=excel_data, file_name='updated_vessel_data.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
