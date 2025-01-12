@@ -14,12 +14,6 @@ uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 if uploaded_file is not None:
     # Membaca file Excel yang di-upload
     df = pd.read_excel(uploaded_file, engine="openpyxl")
-
-# Menghitung VR untuk setiap kapal JIKA kolom VR belum ada
-if 'VR' not in df.columns:
-    df['VR'] = df.apply(lambda row: calculate_vr(
-        row['Disch'], row['Load'], row['CI'],
-        row['GCR'], row['MB']), axis=1)
     
     # Menampilkan nama kolom untuk memeriksa kolom yang ada (opsional, bisa dihapus)
     # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
