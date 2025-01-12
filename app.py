@@ -41,8 +41,14 @@ if uploaded_file is not None:
             row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'],
             row['Performance Crane'], row['Meal Break Time']), axis=1)
         
-        # Menampilkan data kapal dengan VR yang dihitung (menghapus kolom nomor)
-        df_display = df.drop(columns=['0'])  # Hapus kolom nomor jika ada
+        # Menghapus kolom nomor jika ada, memastikan nama kolom yang benar
+        columns_to_drop = ['Vessel No'] if 'Vessel No' in df.columns else []
+        df_display = df.drop(columns=columns_to_drop)  # Hapus kolom nomor jika ada
+        
+        # Menghapus kolom filter (misalnya 'Month') dari tampilan tabel
+        df_display = df_display.drop(columns=['Month'])  # Hapus kolom filter dari tabel yang ditampilkan
+        
+        # Menampilkan data kapal dengan VR yang dihitung
         st.write("Data Kapal dengan VR yang dihitung:", df_display.style.set_table_styles(
             [{'selector': 'th', 'props': [('text-align', 'center'), ('white-space', 'normal')]}]  # Mengatur agar header di-wrap
         ))
