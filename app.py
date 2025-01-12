@@ -28,7 +28,7 @@ if uploaded_file is not None:
     else:
         # Menghitung VR untuk setiap kapal
         df['VR'] = df.apply(lambda row: calculate_vr(
-            row['Disch'], row['Load'], row['TS_SHF'] row['CI'],
+            row['Disch'], row['Load'], row['TS_SHF'], row['CI'],
             row['GCR'], row['MB']), axis=1)
         
         # Mengatur kolom 'Vessel' sebagai index dataframe
