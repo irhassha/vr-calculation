@@ -69,4 +69,4 @@ if uploaded_file is not None:
         average_vr_for_new_ships = vr_needed_by_new_ships / estimated_ships
         
         # Menampilkan hasil Rate to Go
-        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {average_vr_for_new_ships}")
+        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {round(average_vr_for_new_ships, 2)}")
