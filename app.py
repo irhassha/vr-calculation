@@ -4,6 +4,8 @@ import pandas as pd
 # Fungsi untuk menghitung VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     try:
+        ps =  (((discharge + load + TS_SHF) / CI / GCR) + MB)  
+        return round(vr, 2)
         vr = (discharge + load) / (((discharge + load + TS_SHF) / CI / GCR) + MB)  
         return round(vr, 2)
     except ZeroDivisionError:
