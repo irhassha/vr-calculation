@@ -1,4 +1,16 @@
 import streamlit as st
+
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #F0F8FF;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 import pandas as pd
 
 # Menambahkan judul
@@ -48,7 +60,7 @@ if uploaded_file is not None:
             month = st.selectbox("Pilih bulan", df['Month'].unique())
             df_filtered = df[df['Month'] == month]
             avg_vr = df_filtered['VR'].mean()
-            st.write(f"Rata-rata VR untuk bulan {month}: {rond(avg_vr, 2)}")
+            st.write(f"Rata-rata VR untuk bulan {month}: {round(avg_vr, 2)}")
         else:
             # Rata-rata VR keseluruhan
             avg_vr = df['VR'].mean()
@@ -72,4 +84,4 @@ if uploaded_file is not None:
         average_vr_for_new_ships = vr_needed_by_new_ships / estimated_ships
         
         # Menampilkan hasil Rate to Go
-        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {average_vr_for_new_ships}")
+        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {round(average_vr_for_new_ships, 2)}")
