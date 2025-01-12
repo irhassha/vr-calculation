@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd
 
 # Fungsi untuk menghitung VR
-def calculate_vr(discharge, load, CI, GCR, MB):
+def calculate_vr(discharge, load, TS-SHF, CI, GCR, MB):
     try:
-        vr = (discharge + load) / (((discharge + load) / CI / GCR) + MB)
+        vr = (discharge + load + TS-SHF) / (((discharge + load + TS-SHF) / CI / GCR) + MB)
         return round(vr,2)
     except ZeroDivisionError:
         return 0
