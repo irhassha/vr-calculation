@@ -39,12 +39,13 @@ if st.button("Tambah Data Kapal"):
         'Performance Crane': 0,
         'Meal Break Time': 0
     }
-    # Menambahkan baris baru ke DataFrame
-    df = df.append(new_row, ignore_index=True)
+    # Menambahkan baris baru ke DataFrame menggunakan pd.concat
+    new_df = pd.DataFrame([new_row])
+    df = pd.concat([df, new_df], ignore_index=True)
 
 # Menampilkan tabel yang bisa diedit
 st.write("Tabel Data Kapal:")
-edited_df = st.dataframe(df)
+st.write(df)
 
 # Menghitung VR untuk kapal yang ada
 df['VR'] = df.apply(lambda row: calculate_vr(row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'], 
