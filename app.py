@@ -50,7 +50,7 @@ if uploaded_file is not None:
         else:
             # Rata-rata VR keseluruhan
             avg_vr = df['VR'].mean()
-            st.write(f"Rata-rata VR keseluruhan: {round(avg_vr, 2}")
+            st.write(f"Rata-rata VR keseluruhan: {round(avg_vr, 2)}")
         
         # Menampilkan input untuk target VR dan estimasi jumlah kapal berikutnya
         target_vr = st.number_input("Masukkan target VR yang ingin dicapai", min_value=0, value=80)
