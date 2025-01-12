@@ -5,12 +5,9 @@ import pandas as pd
 def calculate_vr(discharge, load, CI, GCR, MB):
     try:
         vr = (discharge + load) / (((discharge + load) / CI / GCR) + MB)
-        return round(vr, 2)
+        return round(vr,2)
     except ZeroDivisionError:
         return 0
-
-# Inisialisasi df sebagai dataframe kosong
-df = pd.DataFrame() 
 
 # Input file excel
 uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
@@ -18,58 +15,49 @@ if uploaded_file is not None:
     # Membaca file Excel yang di-upload
     df = pd.read_excel(uploaded_file, engine="openpyxl")
 
+# Menghitung VR untuk setiap kapal JIKA kolom VR belum ada
+if 'VR' not in df.columns:
+    df['VR'] = df.apply(lambda row: calculate_vr(
+        row['Disch'], row['Load'], row['CI'],
+        row['GCR'], row['MB']), axis=1)
+    
+    # Menampilkan nama kolom untuk memeriksa kolom yang ada (opsional, bisa dihapus)
+    # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
+    
     # Mengecek apakah kolom yang diperlukan ada
     required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'CI', 
                         'GCR', 'MB']
-
+    
     # Mengecek apakah semua kolom yang dibutuhkan ada dalam data
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
         st.error(f"Kolom-kolom berikut tidak ditemukan dalam data: {', '.join(missing_columns)}")
     else:
-        # Menghitung VR untuk setiap kapal JIKA kolom VR belum ada
-        if 'VR' not in df.columns:
-            df['VR'] = df.apply(lambda row: calculate_vr(
-                row['Disch'], row['Load'], row['CI'],
-                row['GCR'], row['MB']), axis=1)
-
+        # Menghitung VR untuk setiap kapal
+        df['VR'] = df.apply(lambda row: calculate_vr(
+            row['Disch'], row['Load'], row['CI'],
+            row['GCR'], row['MB']), axis=1)
+        
         # Mengatur kolom 'Vessel' sebagai index dataframe
         df = df.set_index('Vessel')
-
-        # --- Modifikasi: Form untuk data editor ---
-        with st.form("data_editor_form"):  
-            edited_df = st.experimental_data_editor(df)
-            submit_button = st.form_submit_button("Simpan Perubahan") 
-
-        # --- Modifikasi: JavaScript untuk mengubah label tombol ---
-        st.markdown(
-            """
-            <script>
-            const elements = window.parent.document.querySelectorAll('.stMarkdown button');
-            for (const element of elements) {
-                if (element.textContent === '+') {
-                    element.textContent = 'Tambahkan Data';
-                }
-            }
-            </script>
-            """,
-            unsafe_allow_html=True,
-        )
-
+        
+        # Menampilkan data kapal dengan VR yang dihitung
+        st.write("Data Kapal dengan VR yang dihitung:", df)
+        
         # Memilih opsi apakah perhitungan VR berdasarkan bulan atau keseluruhan
         time_period = st.selectbox("Pilih periode perhitungan VR", ["Overall", "Per Month"])
-
+        
         if time_period == "Per Month":
             # Menghitung rata-rata VR per bulan
-            month = st.selectbox("Pilih bulan", edited_df['Month'].unique()) # Gunakan edited_df
-            df_filtered = edited_df[edited_df['Month'] == month] # Gunakan edited_df
+            month = st.selectbox("Pilih bulan", df['Month'].unique())
+            df_filtered = df[df['Month'] == month]
             avg_vr = df_filtered['VR'].mean()
-            st.write(f"Rata-rata VR untuk bulan {month}: {round(avg_vr, 2)}") # Perbaikan typo
+            st.write(f"Rata-rata VR untuk bulan {month}: {rond(avg_vr, 2)}")
         else:
             # Rata-rata VR keseluruhan
-            avg_vr = edited_df['VR'].mean() # Gunakan edited_df
+            avg_vr = df['VR'].mean()
             st.write(f"Rata-rata VR keseluruhan: {round(avg_vr, 2)}")
-
+        
         # Menampilkan input untuk target VR dan estimasi jumlah kapal berikutnya
         target_vr = st.number_input("Masukkan target VR yang ingin dicapai", min_value=0, value=80)
         estimated_ships = st.number_input("Masukkan estimasi jumlah kapal berikutnya", min_value=1, value=5)
