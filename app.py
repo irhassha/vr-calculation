@@ -24,27 +24,38 @@ if uploaded_file is not None:
     # Membaca file Excel yang di-upload
     df = pd.read_excel(uploaded_file, engine="openpyxl")
     
-    # Menampilkan data di editor untuk memungkinkan pengguna menambah/mengubah data
-    st.write("Edit data di bawah ini jika diperlukan:")
-    df = st.experimental_data_editor(df, num_rows="dynamic")
-
     # Pastikan semua kolom yang dibutuhkan ada
     required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'CI', 'GCR', 'MB']
     missing_columns = [col for col in required_columns if col not in df.columns]
     if missing_columns:
         st.error(f"Kolom berikut tidak ditemukan dalam data: {', '.join(missing_columns)}")
     else:
-        # Menghitung VR untuk setiap kapal jika kolom VR belum ada
-        if 'VR' not in df.columns:
-            df['VR'] = df.apply(lambda row: calculate_vr(
-                row['Disch'], row['Load'], row['CI'], row['GCR'], row['MB']), axis=1)
-        else:
-            # Update kolom VR jika data diubah
-            df['VR'] = df.apply(lambda row: calculate_vr(
-                row['Disch'], row['Load'], row['CI'], row['GCR'], row['MB']), axis=1)
-        
-        # Menampilkan data kapal dengan VR yang dihitung
-        st.write("Data Kapal dengan VR yang dihitung:", df)
+        # Menampilkan data awal
+        st.write("Data Kapal:")
+        st.dataframe(df)
+
+        # Formulir untuk menambah data baru
+        st.write("Tambah Data Baru:")
+        with st.form(key="add_data_form"):
+            new_data = {
+                "Vessel": st.text_input("Vessel"),
+                "Month": st.text_input("Month"),
+                "Disch": st.number_input("Discharge", min_value=0, value=0),
+                "Load": st.number_input("Load", min_value=0, value=0),
+                "CI": st.number_input("Crane Intensity", min_value=0, value=1),
+                "GCR": st.number_input("Performance Crane", min_value=0.1, value=1.0),
+                "MB": st.number_input("Meal Break Time", min_value=0, value=0),
+            }
+            submit_button = st.form_submit_button("Tambahkan")
+
+        if submit_button:
+            # Tambahkan data baru ke dataframe
+            new_data["VR"] = calculate_vr(new_data["Disch"], new_data["Load"], 
+                                          new_data["CI"], new_data["GCR"], new_data["MB"])
+            df = pd.concat([df, pd.DataFrame([new_data])], ignore_index=True)
+            st.success("Data baru berhasil ditambahkan!")
+            st.write("Data terbaru:")
+            st.dataframe(df)
 
         # Pilihan untuk rata-rata VR
         time_period = st.selectbox("Pilih periode perhitungan VR", ["Overall", "Per Month"])
