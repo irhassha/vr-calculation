@@ -9,6 +9,14 @@ def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break
     vr = (discharge + load) / (((discharge + load) / crane_intensity / crane_performance) + meal_break)
     return vr
 
+# Fungsi untuk menghitung rate to go
+def calculate_rate_to_go(df, target_vr):
+    # Menghitung rata-rata VR yang sudah ada
+    avg_vr = df['VR'].mean()
+    if avg_vr == 0:
+        return target_vr  # Jika avg_vr adalah 0, kapal berikutnya butuh target VR penuh
+    return target_vr - avg_vr
+
 # Upload file Excel untuk data kapal
 st.title('Kalkulator VR Kapal')
 
@@ -53,6 +61,9 @@ if df is not None and st.button("Tambah Data Kapal"):
 
 # Menampilkan tabel yang bisa diedit hanya jika df ada
 if df is not None:
+    # Menampilkan data tanpa kolom nomor paling kiri
+    df = df[['Vessel', 'Month', 'Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 'Performance Crane', 'Meal Break Time']]
+    
     st.write("Tabel Data Kapal:")
     st.write(df)
 
@@ -82,13 +93,15 @@ if df is not None:
     # Menampilkan hasil perhitungan target VR
     st.write(f"Target VR yang dimasukkan: {target_vr}")
 
-    # Menambahkan kolom untuk membandingkan dengan target VR
-    df['Target VR'] = target_vr
-    df['Deviation from Target'] = df['VR'] - df['Target VR']
+    # Menghitung rate to go untuk kapal berikutnya
+    df['Rate to Go'] = df.apply(lambda row: calculate_rate_to_go(df, target_vr), axis=1)
 
-    # Menampilkan data kapal dengan VR dan perbandingan dengan target VR
-    st.write("Data Kapal dengan VR dan Perbandingan dengan Target:")
-    st.write(df[['Vessel', 'Month', 'VR', 'Target VR', 'Deviation from Target']])
+    # Menambahkan kolom untuk target VR
+    df['Target VR'] = target_vr
+
+    # Menampilkan data kapal dengan VR dan rate to go
+    st.write("Data Kapal dengan VR dan Rate to Go:")
+    st.write(df[['Vessel', 'Month', 'VR', 'Target VR', 'Rate to Go']])
 
     # Menyimpan kembali ke file Excel menggunakan BytesIO untuk membuat file Excel
     def to_excel(df):
