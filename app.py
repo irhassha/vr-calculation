@@ -4,8 +4,8 @@ import pandas as pd
 # Fungsi untuk menghitung VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     try:
-        vr = (discharge + load + TS_SHF) / (((discharge + load + TS_SHF) / CI / GCR) + MB)
-        return round(vr,2)
+        vr = (discharge + load) / (((discharge + load + TS_SHF) / CI / GCR) + MB)  
+        return round(vr, 2)
     except ZeroDivisionError:
         return 0
 
@@ -15,7 +15,16 @@ if uploaded_file is not None:
     # Membaca file Excel yang di-upload
     df = pd.read_excel(uploaded_file, engine="openpyxl")
     
-    # Menampilkan nama kolom untuk memeriksa kolom yang ada (opsional, bisa dihapus)
+    # ... (kode untuk memeriksa kolom-kolom yang dibutuhkan)
+
+    # Menghitung VR hanya jika kolom VR kosong
+    for index, row in df.iterrows():
+        if pd.isna(row['VR']):  # Periksa apakah nilai VR kosong (NaN)
+            df.loc[index, 'VR'] = calculate_vr(
+                row['Disch'], row['Load'], row['TS SHF'], row['CI'],
+                row['GCR'], row['MB']
+            )
+ # Menampilkan nama kolom untuk memeriksa kolom yang ada (opsional, bisa dihapus)
     # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
     
     # Mengecek apakah kolom yang diperlukan ada
