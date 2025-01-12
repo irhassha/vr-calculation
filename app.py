@@ -1,13 +1,11 @@
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Fungsi untuk menghitung VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     try:
-        # Perbaikan: Gunakan 'TS SHF' sesuai dengan penamaan di kode
-        vr = (discharge + load + TS_SHF) / (((discharge + load + TS_SHF) / CI / GCR) + MB)  
-        return round(vr, 2)
+        vr = (discharge + load + TS_SHF) / (((discharge + load + TS_SHF) / CI / GCR) + MB)
+        return round(vr,2)
     except ZeroDivisionError:
         return 0
 
@@ -21,8 +19,7 @@ if uploaded_file is not None:
     # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
     
     # Mengecek apakah kolom yang diperlukan ada
-    # Perbaikan: Gunakan 'TS SHF' di required_columns
-    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'TS SHF', 'CI', 'GCR', 'MB'] 
+    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'TS SHF', 'CI', 'GCR', 'MB']
     
     # Mengecek apakah semua kolom yang dibutuhkan ada dalam data
     missing_columns = [col for col in required_columns if col not in df.columns]
@@ -30,9 +27,8 @@ if uploaded_file is not None:
         st.error(f"Kolom-kolom berikut tidak ditemukan dalam data: {', '.join(missing_columns)}")
     else:
         # Menghitung VR untuk setiap kapal
-        # Perbaikan: Gunakan 'TS SHF' saat mengakses kolom
         df['VR'] = df.apply(lambda row: calculate_vr(
-            row['Disch'], row['Load'], row['TS SHF'], row['CI'], 
+            row['Disch'], row['Load'], row['TS SHF'], row['CI'],
             row['GCR'], row['MB']), axis=1)
         
         # Mengatur kolom 'Vessel' sebagai index dataframe
@@ -40,16 +36,6 @@ if uploaded_file is not None:
         
         # Menampilkan data kapal dengan VR yang dihitung
         st.write("Data Kapal dengan VR yang dihitung:", df)
-
-        # Konfigurasi GridOptionsBuilder
-        gb = GridOptionsBuilder.from_dataframe(df)
-        gb.configure_default_column(editable=True, groupable=True, value=True, enableRowGroup=True, aggFunc='sum')
-        gb.configure_selection('single')
-        gb.configure_grid_options(domLayout='normal')
-        gridOptions = gb.build()
-
-        # Menampilkan tabel AgGrid
-        AgGrid(df, gridOptions=gridOptions)
         
         # Memilih opsi apakah perhitungan VR berdasarkan bulan atau keseluruhan
         time_period = st.selectbox("Pilih periode perhitungan VR", ["Overall", "Per Month"])
@@ -59,7 +45,7 @@ if uploaded_file is not None:
             month = st.selectbox("Pilih bulan", df['Month'].unique())
             df_filtered = df[df['Month'] == month]
             avg_vr = df_filtered['VR'].mean()
-            st.write(f"Rata-rata VR untuk bulan {month}: {round(avg_vr, 2)}") # Perbaikan: round(avg_vr, 2)
+            st.write(f"Rata-rata VR untuk bulan {month}: {rond(avg_vr, 2)}")
         else:
             # Rata-rata VR keseluruhan
             avg_vr = df['VR'].mean()
@@ -83,4 +69,4 @@ if uploaded_file is not None:
         average_vr_for_new_ships = vr_needed_by_new_ships / estimated_ships
         
         # Menampilkan hasil Rate to Go
-        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {round(average_vr_for_new_ships, 2)}")
+        st.write(f"Rata-rata VR yang diperlukan oleh kapal berikutnya agar target tercapai: {average_vr_for_new_ships}")
