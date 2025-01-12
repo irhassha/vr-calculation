@@ -9,6 +9,15 @@ def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break
     except ZeroDivisionError:
         return 0
 
+# Set background color
+st.markdown("""
+    <style>
+        body {
+            background-color: #F0F8FF;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 # Input file excel
 uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 if uploaded_file is not None:
@@ -32,8 +41,11 @@ if uploaded_file is not None:
             row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'],
             row['Performance Crane'], row['Meal Break Time']), axis=1)
         
-        # Menampilkan data kapal dengan VR yang dihitung
-        st.write("Data Kapal dengan VR yang dihitung:", df)
+        # Menampilkan data kapal dengan VR yang dihitung (menghapus kolom nomor)
+        df_display = df.drop(columns=['Vessel No'])  # Hapus kolom nomor jika ada
+        st.write("Data Kapal dengan VR yang dihitung:", df_display.style.set_table_styles(
+            [{'selector': 'th', 'props': [('text-align', 'center'), ('white-space', 'normal')]}]  # Mengatur agar header di-wrap
+        ))
         
         # Memilih opsi apakah perhitungan VR berdasarkan bulan atau keseluruhan
         time_period = st.selectbox("Pilih periode perhitungan VR", ["Overall", "Per Month"])
