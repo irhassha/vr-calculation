@@ -19,8 +19,8 @@ if uploaded_file is not None:
     st.write("Nama kolom yang ada dalam file Excel:", df.columns)
     
     # Mengecek apakah kolom yang diperlukan ada
-    required_columns = ['Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 
-                        'Performance crane per jam', 'Total meal break', 'Month']
+    required_columns = ['Vessel', 'Month', 'Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 
+                        'Performance Crane', 'Meal Break Time']
     
     # Mengecek apakah semua kolom yang dibutuhkan ada dalam data
     missing_columns = [col for col in required_columns if col not in df.columns]
@@ -30,7 +30,7 @@ if uploaded_file is not None:
         # Menghitung VR untuk setiap kapal
         df['VR'] = df.apply(lambda row: calculate_vr(
             row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'],
-            row['Performance crane per jam'], row['Total meal break']), axis=1)
+            row['Performance Crane'], row['Meal Break Time']), axis=1)
         
         # Menampilkan data kapal dengan VR yang dihitung
         st.write("Data Kapal dengan VR yang dihitung:", df)
