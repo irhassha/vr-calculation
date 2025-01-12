@@ -6,16 +6,16 @@ def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break
     vr = (discharge + load) / (((discharge + load) / crane_intensity / crane_performance) + meal_break)
     return vr
 
-# Upload CSV untuk data kapal
+# Upload file Excel untuk data kapal
 st.title('Kalkulator VR Kapal')
 
-# Upload file CSV
-uploaded_file = st.file_uploader("Unggah Data Kapal (CSV)", type=["csv"])
+# Upload file Excel
+uploaded_file = st.file_uploader("Unggah Data Kapal (Excel)", type=["xlsx"])
 
 # Jika file di-upload, load data dan tampilkan
 if uploaded_file is not None:
-    # Membaca file CSV
-    df = pd.read_csv(uploaded_file)
+    # Membaca file Excel
+    df = pd.read_excel(uploaded_file)
     st.write("Data Kapal yang Diupload:")
     st.write(df)
 
@@ -23,10 +23,10 @@ if uploaded_file is not None:
     required_columns = ['Vessel', 'ETA', 'Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 'Performance Crane', 'Meal Break Time']
     for col in required_columns:
         if col not in df.columns:
-            st.error(f"Kolom '{col}' tidak ditemukan dalam file CSV.")
+            st.error(f"Kolom '{col}' tidak ditemukan dalam file Excel.")
             break
 else:
-    st.info("Silakan unggah file CSV dengan data kapal.")
+    st.info("Silakan unggah file Excel dengan data kapal.")
 
 # Menambahkan baris baru jika ada tombol tambah
 if st.button("Tambah Data Kapal"):
@@ -59,6 +59,6 @@ st.write(df[['Vessel', 'VR']])
 average_vr = df['VR'].mean()
 st.write(f"Rata-rata VR dari semua kapal: {average_vr:.2f}")
 
-# Menyimpan kembali ke file CSV
-csv_data = df.to_csv(index=False)
-st.download_button("Unduh Data Kapal yang Diperbarui", data=csv_data, file_name='updated_vessel_data.csv', mime='text/csv')
+# Menyimpan kembali ke file Excel
+excel_data = df.to_excel(index=False, engine='openpyxl')
+st.download_button("Unduh Data Kapal yang Diperbarui", data=excel_data, file_name='updated_vessel_data.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
