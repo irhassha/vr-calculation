@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 
+# Menambahkan judul
+st.title("VR Calculation")
+
 # Fungsi untuk menghitung VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     try:
