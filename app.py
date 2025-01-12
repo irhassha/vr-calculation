@@ -9,23 +9,14 @@ def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break
     except ZeroDivisionError:
         return 0
 
-# Set background color
-st.markdown("""
-    <style>
-        body {
-            background-color: #F0F8FF;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 # Input file excel
 uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
 if uploaded_file is not None:
     # Membaca file Excel yang di-upload
     df = pd.read_excel(uploaded_file, engine="openpyxl")
     
-    # Menampilkan nama kolom untuk memeriksa kolom yang ada
-    st.write("Nama kolom yang ada dalam file Excel:", df.columns)
+    # Menampilkan nama kolom untuk memeriksa kolom yang ada (opsional, bisa dihapus)
+    # st.write("Nama kolom yang ada dalam file Excel:", df.columns)
     
     # Mengecek apakah kolom yang diperlukan ada
     required_columns = ['Vessel', 'Month', 'Jumlah Bongkar', 'Jumlah Muat', 'Crane Intensity', 
@@ -41,17 +32,11 @@ if uploaded_file is not None:
             row['Jumlah Bongkar'], row['Jumlah Muat'], row['Crane Intensity'],
             row['Performance Crane'], row['Meal Break Time']), axis=1)
         
-        # Menghapus kolom nomor jika ada, memastikan nama kolom yang benar
-        columns_to_drop = ['Vessel No'] if 'Vessel No' in df.columns else []
-        df_display = df.drop(columns=columns_to_drop)  # Hapus kolom nomor jika ada
-        
-        # Menghapus kolom filter (misalnya 'Month') dari tampilan tabel
-        df_display = df_display.drop(columns=['Month'])  # Hapus kolom filter dari tabel yang ditampilkan
+        # Mengatur kolom 'Vessel' sebagai index dataframe
+        df = df.set_index('Vessel')
         
         # Menampilkan data kapal dengan VR yang dihitung
-        st.write("Data Kapal dengan VR yang dihitung:", df_display.style.set_table_styles(
-            [{'selector': 'th', 'props': [('text-align', 'center'), ('white-space', 'normal')]}]  # Mengatur agar header di-wrap
-        ))
+        st.write("Data Kapal dengan VR yang dihitung:", df)
         
         # Memilih opsi apakah perhitungan VR berdasarkan bulan atau keseluruhan
         time_period = st.selectbox("Pilih periode perhitungan VR", ["Overall", "Per Month"])
