@@ -42,7 +42,7 @@ if uploaded_file is not None:
             row['Performance Crane'], row['Meal Break Time']), axis=1)
         
         # Menampilkan data kapal dengan VR yang dihitung (menghapus kolom nomor)
-        df_display = df.drop(columns=['Vessel No'])  # Hapus kolom nomor jika ada
+        df_display = df.drop(columns=['0'])  # Hapus kolom nomor jika ada
         st.write("Data Kapal dengan VR yang dihitung:", df_display.style.set_table_styles(
             [{'selector': 'th', 'props': [('text-align', 'center'), ('white-space', 'normal')]}]  # Mengatur agar header di-wrap
         ))
