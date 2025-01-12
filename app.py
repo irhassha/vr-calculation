@@ -1,8 +1,10 @@
 import streamlit as st
 import pandas as pd
 
-# Fungsi untuk menghitung VR
+# Fungsi untuk menghitung VR dengan pengecekan pembagian nol
 def calculate_vr(discharge, load, crane_intensity, crane_performance, meal_break):
+    if crane_intensity == 0 or crane_performance == 0 or (discharge + load) == 0:
+        return 0  # Atau bisa mengembalikan nilai lainnya jika ingin menghindari pembagian dengan nol
     vr = (discharge + load) / (((discharge + load) / crane_intensity / crane_performance) + meal_break)
     return vr
 
