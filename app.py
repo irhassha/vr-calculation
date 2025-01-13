@@ -23,14 +23,6 @@ def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     except ZeroDivisionError:
         return 0
 
-# Function to calculate GCR (ganti dengan rumus yang sesuai)
-def calculate_gcr(var1, var2):  
-    try:
-        gcr = var1 * var2 / 10  # Contoh rumus GCR
-        return round(gcr, 2)
-    except ZeroDivisionError:
-        return 0
-
 # Sidebar
 with st.sidebar:
     uploaded_file = st.file_uploader("Upload Excel file", type=["xlsx"])
@@ -80,19 +72,21 @@ if uploaded_file is not None:
         with col2:
             estimated_ships = st.number_input("Enter estimated number of next ships", min_value=1, value=5)
         
-        # ... (kode untuk menghitung dan menampilkan hasil Rate to Go)
-
-        # Input untuk perhitungan GCR
-        st.subheader("GCR Calculation")
-        col3, col4 = st.columns(2)
-        with col3:
-            gcr_var1 = st.number_input("Enter GCR variable 1", min_value=0.0, value=10.0)
-        with col4:
-            gcr_var2 = st.number_input("Enter GCR variable 2", min_value=0.0, value=20.0)
-
-        # Hitung dan tampilkan hasil GCR
-        gcr_result = calculate_gcr(gcr_var1, gcr_var2)
-        st.write(f"GCR Result: {gcr_result}")
+        # Calculate total VR needed to achieve the target average VR
+        total_ships = len(df) + estimated_ships
+        total_vr_needed = total_ships * target_vr
+        
+        # Calculate total existing VR
+        total_current_vr = len(df) * avg_vr
+        
+        # Calculate total VR that needs to be added by the next ship
+        vr_needed_by_new_ships = total_vr_needed - total_current_vr
+        
+        # Calculate the average VR required by the next ship
+        average_vr_for_new_ships = vr_needed_by_new_ships / estimated_ships
+        
+        # Display Rate to Go results
+        st.write(f"Average VR required by the next ship to reach the target: {round(average_vr_for_new_ships, 2)}")
 
         # Display ship data with calculated VR
         st.write("Ship Data with calculated VR:", df)
