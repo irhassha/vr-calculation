@@ -13,15 +13,27 @@ st.markdown(
 )
 
 # Add title
-st.title("VR Calculation")
+st.title("VR and GCR Calculation")
 
 # Function to calculate VR
 def calculate_vr(discharge, load, TS_SHF, CI, GCR, MB):
     try:
         vr = (discharge + load + TS_SHF) / (((discharge + load + TS_SHF) / CI / GCR) + MB)
-        return round(vr,2)
+        return round(vr, 2)
     except ZeroDivisionError:
         return 0
+
+# Function to calculate GCR Rate to Go
+def calculate_gcr_rate_to_go(current_ships, avg_current_gcr, target_gcr, next_ships):
+    try:
+        total_ships = current_ships + next_ships
+        total_gcr_needed = total_ships * target_gcr
+        total_gcr_current = current_ships * avg_current_gcr
+        gcr_needed = total_gcr_needed - total_gcr_current
+        avg_gcr_for_next_ships = gcr_needed / next_ships
+        return avg_gcr_for_next_ships
+    except ZeroDivisionError:
+        return "Next ships cannot be zero."
 
 # Sidebar
 with st.sidebar:
@@ -32,14 +44,10 @@ if uploaded_file is not None:
     # Read uploaded Excel file
     df = pd.read_excel(uploaded_file, engine="openpyxl")
     
-    # Display column names to check existing columns (optional, can be removed)
-    # st.write("Column names in the Excel file:", df.columns)
-    
     # Check if necessary columns exist
     required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'TS SHF', 'CI', 'GCR', 'MB']
-    
-    # Check if all required columns exist in the data
     missing_columns = [col for col in required_columns if col not in df.columns]
+    
     if missing_columns:
         st.error(f"The following columns were not found in the data: {', '.join(missing_columns)}")
     else:
@@ -59,34 +67,41 @@ if uploaded_file is not None:
             month = st.selectbox("Select month", df['Month'].unique())
             df_filtered = df[df['Month'] == month]
             avg_vr = df_filtered['VR'].mean()
+            avg_gcr = df_filtered['GCR'].mean()
             st.write(f"Average VR for {month}: {round(avg_vr, 2)}")
+            st.write(f"Average GCR for {month}: {round(avg_gcr, 2)}")
         else:
-            # Overall average VR
+            # Overall average VR and GCR
             avg_vr = df['VR'].mean()
+            avg_gcr = df['GCR'].mean()
             st.write(f"Overall average VR: {round(avg_vr, 2)}")
+            st.write(f"Overall average GCR: {round(avg_gcr, 2)}")
 
-        # Display input for target VR and estimated number of next ships
-        col1, col2 = st.columns(2)
+        # Display input for target VR, target GCR, and estimated number of next ships
+        col1, col2, col3 = st.columns(3)
         with col1:
             target_vr = st.number_input("Enter target VR to be achieved", min_value=0, value=80)
         with col2:
+            target_gcr = st.number_input("Enter target GCR to be achieved", min_value=0, value=25)
+        with col3:
             estimated_ships = st.number_input("Enter estimated number of next ships", min_value=1, value=5)
         
-        # Calculate total VR needed to achieve the target average VR
+        # VR calculations
         total_ships = len(df) + estimated_ships
         total_vr_needed = total_ships * target_vr
-        
-        # Calculate total existing VR
         total_current_vr = len(df) * avg_vr
-        
-        # Calculate total VR that needs to be added by the next ship
         vr_needed_by_new_ships = total_vr_needed - total_current_vr
-        
-        # Calculate the average VR required by the next ship
         average_vr_for_new_ships = vr_needed_by_new_ships / estimated_ships
+        
+        # GCR calculations
+        total_gcr_needed = total_ships * target_gcr
+        total_current_gcr = len(df) * avg_gcr
+        gcr_needed_by_new_ships = total_gcr_needed - total_current_gcr
+        average_gcr_for_new_ships = gcr_needed_by_new_ships / estimated_ships
         
         # Display Rate to Go results
         st.write(f"Average VR required by the next ship to reach the target: {round(average_vr_for_new_ships, 2)}")
+        st.write(f"Average GCR required by the next ship to reach the target: {round(average_gcr_for_new_ships, 2)}")
 
         # Display ship data with calculated VR
         st.write("Ship Data with calculated VR:", df)
