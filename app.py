@@ -32,14 +32,23 @@ if uploaded_file is not None:
     # Read uploaded Excel file
     df = pd.read_excel(uploaded_file, engine="openpyxl")
     
-    # ... (kode untuk memeriksa kolom)
-
-    # Calculate VR for each ship
-    df['VR'] = df.apply(lambda row: calculate_vr(
-        row['Disch'], row['Load'], row['TS SHF'], row['CI'],
-        row['GCR'], row['MB']), axis=1)
+    # Display column names to check existing columns (optional, can be removed)
+    # st.write("Column names in the Excel file:", df.columns)
     
-   # Set 'Vessel' column as dataframe index
+    # Check if necessary columns exist
+    required_columns = ['Vessel', 'Month', 'Disch', 'Load', 'TS SHF', 'CI', 'GCR', 'MB']
+    
+    # Check if all required columns exist in the data
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        st.error(f"The following columns were not found in the data: {', '.join(missing_columns)}")
+    else:
+        # Calculate VR for each ship
+        df['VR'] = df.apply(lambda row: calculate_vr(
+            row['Disch'], row['Load'], row['TS SHF'], row['CI'],
+            row['GCR'], row['MB']), axis=1)
+        
+        # Set 'Vessel' column as dataframe index
         df = df.set_index('Vessel')
         
         # Display ship data with calculated VR
@@ -58,10 +67,13 @@ if uploaded_file is not None:
             # Overall average VR
             avg_vr = df['VR'].mean()
             st.write(f"Overall average VR: {round(avg_vr, 2)}")
-        
+
         # Display input for target VR and estimated number of next ships
-        target_vr = st.number_input("Enter target VR to be achieved", min_value=0, value=80)
-        estimated_ships = st.number_input("Enter estimated number of next ships", min_value=1, value=5)
+        col1, col2 = st.columns(2)  # Bagi area menjadi 2 kolom
+        with col1:
+            target_vr = st.number_input("Enter target VR to be achieved", min_value=0, value=80)
+        with col2:
+            estimated_ships = st.number_input("Enter estimated number of next ships", min_value=1, value=5)
         
         # Calculate total VR needed to achieve the target average VR
         total_ships = len(df) + estimated_ships
