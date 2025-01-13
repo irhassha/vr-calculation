@@ -50,10 +50,7 @@ if uploaded_file is not None:
         
         # Set 'Vessel' column as dataframe index
         df = df.set_index('Vessel')
-        
-        # Display ship data with calculated VR
-        st.write("Ship Data with calculated VR:", df)
-        
+
         # Select option whether VR calculation is based on month or overall
         time_period = st.selectbox("Select VR calculation period", ["Overall", "Per Month"])
         
@@ -69,7 +66,7 @@ if uploaded_file is not None:
             st.write(f"Overall average VR: {round(avg_vr, 2)}")
 
         # Display input for target VR and estimated number of next ships
-        col1, col2 = st.columns(2)  # Bagi area menjadi 2 kolom
+        col1, col2 = st.columns(2)
         with col1:
             target_vr = st.number_input("Enter target VR to be achieved", min_value=0, value=80)
         with col2:
@@ -90,3 +87,6 @@ if uploaded_file is not None:
         
         # Display Rate to Go results
         st.write(f"Average VR required by the next ship to reach the target: {round(average_vr_for_new_ships, 2)}")
+
+        # Display ship data with calculated VR
+        st.write("Ship Data with calculated VR:", df)
