@@ -104,4 +104,4 @@ if uploaded_file is not None:
         st.write(f"Average GCR Rate to Go: {round(average_gcr_for_new_ships, 2)}")
 
         # Display ship data with calculated VR
-        st.write("Ship Data with calculated VR:", df)
+        st.write("Vessel Data with calculated VR:", df)
