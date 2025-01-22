@@ -100,8 +100,8 @@ if uploaded_file is not None:
         average_gcr_for_new_ships = gcr_needed_by_new_ships / estimated_ships
         
         # Display Rate to Go results
-        st.write(f"Average VR required by the next ship to reach the target: {round(average_vr_for_new_ships, 2)}")
-        st.write(f"Average GCR required by the next ship to reach the target: {round(average_gcr_for_new_ships, 2)}")
+        st.write(f"Average VR Rate to Go: {round(average_vr_for_new_ships, 2)}")
+        st.write(f"Average GCR Rate to Go: {round(average_gcr_for_new_ships, 2)}")
 
         # Display ship data with calculated VR
         st.write("Ship Data with calculated VR:", df)
